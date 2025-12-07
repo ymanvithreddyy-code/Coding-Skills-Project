@@ -3,12 +3,8 @@
 A comprehensive web-based application for managing student records, academic performance, and administrative requests. This system provides distinct portals for Administrators and Students, ensuring secure and efficient data management.
 
 ## 👥 Team Members
-*   **Subhalaxmi** - AP2411001029
-*   **Lopa** - AP24110010832
-*   **Rushikesh** - AP24110010874
-*   **Varshith** - AP24110010865
-*   **Vamsi** - AP2411001012
-*   **Jeevan Sai** - AP2411001097
+*   **Yekollu Manvith** - AP24110010837
+
 
 ## 🚀 Features
 
