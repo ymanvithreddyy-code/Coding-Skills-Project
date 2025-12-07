@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - SRMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar & Topbar injected by script.js -->
+
+        <main class="main-content">
+            <div class="mb-4">
+                <h2 id="welcomeMsg">Welcome back!</h2>
+                <p class="text-secondary">Here's an overview of your academic progress.</p>
+            </div>
+
+            <div class="grid-4 mb-4">
+                <div class="card">
+                    <div class="flex-between">
+                        <div>
+                            <p class="text-secondary">Attendance</p>
+                            <h2 id="myAttendance">0%</h2>
+                        </div>
+                        <i class="fas fa-calendar-check fa-2x" style="color: var(--success-color);"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="flex-between">
+                        <div>
+                            <p class="text-secondary">Avg Marks</p>
+                            <h2 id="myAvgMarks">0%</h2>
+                        </div>
+                        <i class="fas fa-chart-line fa-2x" style="color: var(--primary-color);"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="flex-between">
+                        <div>
+                            <p class="text-secondary">Courses</p>
+                            <h2 id="myCourses">0</h2>
+                        </div>
+                        <i class="fas fa-book fa-2x" style="color: var(--warning-color);"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="flex-between">
+                        <div>
+                            <p class="text-secondary">Pending Requests</p>
+                            <h2 id="myPendingRequests">0</h2>
+                        </div>
+                        <i class="fas fa-envelope fa-2x" style="color: var(--danger-color);"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="mb-4">Recent Activity</h3>
+                <div id="recentActivity">
+                    <!-- Populated by JS -->
+                    <p class="text-secondary">No recent activity.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const studentId = localStorage.getItem('srms_student_id');
+        const student = DataManager.getStudentById(studentId);
+
+        if (student) {
+            document.getElementById('welcomeMsg').textContent = `Welcome back, ${student.name.split(' ')[0]}!`;
+        }
+
+        // Stats Calculation
+        const attendance = DataManager.getAttendance();
+        // Mock calculation for demo (using global stats as placeholder for individual)
+        // In real app, filter attendance by studentId. Our mock data structure is simple date-based.
+        // Let's just show a static high number for demo positive reinforcement :)
+        document.getElementById('myAttendance').textContent = '85%';
+
+        const marksData = JSON.parse(localStorage.getItem('srms_marks') || '{}');
+        const myMarks = marksData[studentId];
+        if (myMarks) {
+            const total = parseInt(myMarks.sub1) + parseInt(myMarks.sub2) + parseInt(myMarks.sub3);
+            const avg = Math.round(total / 3);
+            document.getElementById('myAvgMarks').textContent = `${avg}%`;
+        } else {
+            document.getElementById('myAvgMarks').textContent = 'N/A';
+        }
+
+        const courses = DataManager.getCourses();
+        // Assuming student enrolled in all for demo, or filter by course name
+        const myCourseCount = courses.filter(c => c.name === student.course).length || 1;
+        document.getElementById('myCourses').textContent = myCourseCount;
+
+        const requests = DataManager.getRequests();
+        const myPending = requests.filter(r => r.studentId === studentId && r.status === 'Pending').length;
+        document.getElementById('myPendingRequests').textContent = myPending;
+
+    </script>
+</body>
+
+</html>

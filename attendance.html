@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance - SRMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .attendance-btn {
+            width: 100px;
+            padding: 0.25rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+        }
+
+        .attendance-btn.present {
+            background-color: #dcfce7;
+            color: #166534;
+            border-color: #bbf7d0;
+        }
+
+        .attendance-btn.absent {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar & Topbar injected by script.js -->
+
+        <main class="main-content">
+            <div class="flex-between mb-4">
+                <h2 class="page-title">Attendance Management</h2>
+                <div style="display: flex; gap: 1rem;">
+                    <input type="date" id="attendanceDate" class="form-control" style="width: auto;">
+                    <select id="courseFilter" class="form-control" style="width: 200px;">
+                        <option value="">All Courses</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Name</th>
+                                <th>Course</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTable">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-right mt-4" style="text-align: right; padding: 1rem;">
+                    <button onclick="saveAttendance()" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Attendance
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const students = DataManager.getStudents();
+        const courses = DataManager.getCourses();
+
+        // Set Today's Date
+        document.getElementById('attendanceDate').valueAsDate = new Date();
+
+        // Populate Filter
+        const courseFilter = document.getElementById('courseFilter');
+        courses.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.name;
+            opt.textContent = c.name;
+            courseFilter.appendChild(opt);
+        });
+
+        // Mock Daily Attendance Storage
+        // Structure: { '2023-10-05': { studentId: 'present' | 'absent' } }
+        let dailyAttendance = JSON.parse(localStorage.getItem('srms_daily_attendance') || '{}');
+
+        function renderTable() {
+            const selectedCourse = courseFilter.value;
+            const date = document.getElementById('attendanceDate').value;
+            const tbody = document.getElementById('attendanceTable');
+            tbody.innerHTML = '';
+
+            const filteredStudents = selectedCourse
+                ? students.filter(s => s.course === selectedCourse)
+                : students;
+
+            // Get existing data for this date or default to 'present'
+            const dateData = dailyAttendance[date] || {};
+
+            filteredStudents.forEach(s => {
+                const status = dateData[s.id] || 'present';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${s.rollNo}</td>
+                    <td>${s.name}</td>
+                    <td>${s.course}</td>
+                    <td>
+                        <button onclick="toggleStatus(this, '${s.id}')" 
+                            class="attendance-btn ${status}" 
+                            data-status="${status}">
+                            ${status.charAt(0).toUpperCase() + status.slice(1)}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        renderTable();
+        courseFilter.addEventListener('change', renderTable);
+        document.getElementById('attendanceDate').addEventListener('change', renderTable);
+
+        window.toggleStatus = (btn, studentId) => {
+            const currentStatus = btn.getAttribute('data-status');
+            const newStatus = currentStatus === 'present' ? 'absent' : 'present';
+
+            btn.setAttribute('data-status', newStatus);
+            btn.className = `attendance-btn ${newStatus}`;
+            btn.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+        };
+
+        window.saveAttendance = () => {
+            const date = document.getElementById('attendanceDate').value;
+            const btns = document.querySelectorAll('.attendance-btn');
+
+            if (!dailyAttendance[date]) dailyAttendance[date] = {};
+
+            btns.forEach(btn => {
+                // Find student ID from the onclick handler or add data-id attribute
+                // Simpler way: iterate students again or store ID on button
+                // Let's assume we need to be robust:
+                // We'll just re-read the table rows since we didn't store ID on button element directly in a clean way above
+                // Actually, the toggleStatus call has the ID. Let's attach it to the button dataset.
+            });
+
+            // Better approach:
+            // We need to capture the state of all buttons currently visible (and potentially those hidden by filter? No, usually you mark for a class).
+            // For simplicity, let's just save what's visible or re-map.
+
+            // Let's iterate the rows
+            const rows = document.querySelectorAll('#attendanceTable tr');
+            rows.forEach(row => {
+                const btn = row.querySelector('.attendance-btn');
+                // We need the student ID. Let's extract it from the onclick attribute or better, add it to dataset in render
+                const onclick = btn.getAttribute('onclick');
+                const idMatch = onclick.match(/'([^']+)'/);
+                if (idMatch) {
+                    const id = idMatch[1];
+                    const status = btn.getAttribute('data-status');
+                    dailyAttendance[date][id] = status;
+                }
+            });
+
+            localStorage.setItem('srms_daily_attendance', JSON.stringify(dailyAttendance));
+
+            // Also update the aggregate stats in DataManager for the dashboard chart
+            // This is a bit complex to sync perfectly, but for a demo:
+            const presentCount = Object.values(dailyAttendance[date]).filter(s => s === 'present').length;
+            const absentCount = Object.values(dailyAttendance[date]).filter(s => s === 'absent').length;
+
+            // Update the main attendance array for charts
+            let mainAttendance = DataManager.getAttendance();
+            // Check if date exists
+            const existingIndex = mainAttendance.findIndex(a => a.date === date);
+            if (existingIndex !== -1) {
+                mainAttendance[existingIndex] = { date, present: presentCount, absent: absentCount };
+            } else {
+                mainAttendance.push({ date, present: presentCount, absent: absentCount });
+            }
+            // Keep only last 7 entries for chart
+            if (mainAttendance.length > 7) mainAttendance.shift();
+
+            localStorage.setItem('srms_attendance', JSON.stringify(mainAttendance));
+
+            alert('Attendance saved successfully!');
+        };
+    </script>
+</body>
+
+</html>

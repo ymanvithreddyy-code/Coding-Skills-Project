@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Courses - SRMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar & Topbar injected by script.js -->
+
+        <main class="main-content">
+            <h2 class="page-title mb-4">My Courses</h2>
+
+            <div class="card">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Course Code</th>
+                                <th>Course Name</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coursesTable">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const studentId = localStorage.getItem('srms_student_id');
+        const student = DataManager.getStudentById(studentId);
+        const courses = DataManager.getCourses();
+
+        const tbody = document.getElementById('coursesTable');
+
+        if (student) {
+            // Find the course object that matches student's course name
+            const myCourse = courses.find(c => c.name === student.course);
+
+            if (myCourse) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge badge-success">${myCourse.code}</span></td>
+                    <td>${myCourse.name}</td>
+                    <td>${myCourse.duration}</td>
+                    <td><span class="badge badge-success">Enrolled</span></td>
+                `;
+                tbody.appendChild(tr);
+            } else {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">No active course enrollment found.</td></tr>';
+            }
+        }
+    </script>
+</body>
+
+</html>

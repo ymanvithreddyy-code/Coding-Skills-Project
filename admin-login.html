@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - SRMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="login-page">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-user-shield fa-3x" style="color: var(--primary-color); margin-bottom: 1rem;"></i>
+                <h1>Admin Login</h1>
+                <p>Enter your credentials to access the dashboard</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" placeholder="admin" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="admin" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                <div class="text-center mt-4">
+                    <a href="index.html" style="color: var(--primary-color); font-size: 0.9rem;">Back to Home</a>
+                </div>
+                <p id="errorMsg"
+                    style="color: var(--danger-color); text-align: center; margin-top: 1rem; display: none;">Invalid
+                    credentials</p>
+            </form>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+
+            if (user === 'admin' && pass === 'admin') {
+                localStorage.setItem('srms_role', 'admin');
+                window.location.href = 'dashboard.html';
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>

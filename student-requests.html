@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requests - SRMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar & Topbar injected by script.js -->
+
+        <main class="main-content">
+            <h2 class="page-title mb-4">Raise a Request</h2>
+
+            <div class="grid-2 mb-4" style="grid-template-columns: 1fr 2fr;">
+                <div class="card">
+                    <h3 class="mb-4">New Request</h3>
+                    <form id="requestForm">
+                        <div class="form-group">
+                            <label class="form-label">Request Type</label>
+                            <select name="type" class="form-control" required>
+                                <option value="">Select Type</option>
+                                <option value="Personal Info Update">Personal Info Update</option>
+                                <option value="Correction">Correction (Marks/Attendance)</option>
+                                <option value="Complaint">Complaint</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="4" required
+                                placeholder="Describe your issue..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Request</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3 class="mb-4">My Requests History</h3>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="myRequestsTable">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const studentId = localStorage.getItem('srms_student_id');
+
+        function renderMyRequests() {
+            const requests = DataManager.getRequests();
+            const myRequests = requests.filter(r => r.studentId === studentId).reverse();
+            const tbody = document.getElementById('myRequestsTable');
+            tbody.innerHTML = '';
+
+            if (myRequests.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">No requests found.</td></tr>';
+                return;
+            }
+
+            myRequests.forEach(r => {
+                let statusBadge = '';
+                if (r.status === 'Pending') statusBadge = '<span class="badge" style="background: #fef3c7; color: #b45309;">Pending</span>';
+                else if (r.status === 'Approved') statusBadge = '<span class="badge badge-success">Approved</span>';
+                else if (r.status === 'Rejected') statusBadge = '<span class="badge badge-danger">Rejected</span>';
+                else if (r.status === 'Resolved') statusBadge = '<span class="badge badge-success">Resolved</span>';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${r.date}</td>
+                    <td>${r.type}</td>
+                    <td>${r.description}</td>
+                    <td>${statusBadge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        renderMyRequests();
+
+        document.getElementById('requestForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const requestData = Object.fromEntries(formData.entries());
+
+            DataManager.addRequest({
+                ...requestData,
+                studentId: studentId
+            });
+
+            alert('Request submitted successfully!');
+            e.target.reset();
+            renderMyRequests();
+        });
+    </script>
+</body>
+
+</html>

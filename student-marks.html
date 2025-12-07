@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Marks - SRMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar & Topbar injected by script.js -->
+
+        <main class="main-content">
+            <h2 class="page-title mb-4">My Marks</h2>
+
+            <div class="card">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Marks Obtained</th>
+                                <th>Max Marks</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marksTable">
+                            <!-- Populated by JS -->
+                        </tbody>
+                        <tfoot style="background-color: #f8fafc; font-weight: bold;">
+                            <tr>
+                                <td>Total</td>
+                                <td id="totalMarks">-</td>
+                                <td>300</td>
+                                <td id="finalGrade">-</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const studentId = localStorage.getItem('srms_student_id');
+        const marksData = JSON.parse(localStorage.getItem('srms_marks') || '{}');
+        const myMarks = marksData[studentId];
+
+        const tbody = document.getElementById('marksTable');
+
+        if (myMarks) {
+            const subjects = [
+                { name: 'Subject 1', score: parseInt(myMarks.sub1) },
+                { name: 'Subject 2', score: parseInt(myMarks.sub2) },
+                { name: 'Subject 3', score: parseInt(myMarks.sub3) }
+            ];
+
+            let total = 0;
+
+            subjects.forEach(sub => {
+                total += sub.score;
+                let grade = 'F';
+                if (sub.score >= 90) grade = 'A+';
+                else if (sub.score >= 80) grade = 'A';
+                else if (sub.score >= 70) grade = 'B';
+                else if (sub.score >= 60) grade = 'C';
+                else if (sub.score >= 50) grade = 'D';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${sub.name}</td>
+                    <td>${sub.score}</td>
+                    <td>100</td>
+                    <td><span class="badge ${grade === 'F' ? 'badge-danger' : 'badge-success'}">${grade}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('totalMarks').textContent = total;
+            const avg = total / 3;
+            let finalGrade = 'F';
+            if (avg >= 90) finalGrade = 'A+';
+            else if (avg >= 80) finalGrade = 'A';
+            else if (avg >= 70) finalGrade = 'B';
+            else if (avg >= 60) finalGrade = 'C';
+            else if (avg >= 50) finalGrade = 'D';
+
+            document.getElementById('finalGrade').textContent = finalGrade;
+
+        } else {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center">No marks available yet.</td></tr>';
+        }
+    </script>
+</body>
+
+</html>

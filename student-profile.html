@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - SRMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-pic-large {
+            width: 120px;
+            height: 120px;
+            background-color: var(--success-color);
+            color: white;
+            font-size: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-item label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .info-item p {
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar & Topbar injected by script.js -->
+
+        <main class="main-content">
+            <h2 class="page-title mb-4">My Profile</h2>
+
+            <div class="card mb-4">
+                <div class="profile-header">
+                    <div class="profile-pic-large" id="profilePic">S</div>
+                    <div>
+                        <h1 id="studentName" style="margin-bottom: 0.5rem;">Student Name</h1>
+                        <p id="studentRoll" style="color: var(--text-secondary); font-size: 1.1rem;">Roll No: -</p>
+                        <span class="badge badge-success mt-4">Active Student</span>
+                    </div>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0;">
+
+                <h3 class="mb-4">Personal Information</h3>
+                <div class="info-grid mb-4">
+                    <div class="info-item">
+                        <label>Email</label>
+                        <p id="studentEmail">-</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Phone</label>
+                        <p id="studentPhone">-</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Date of Birth</label>
+                        <p id="studentDob">-</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Gender</label>
+                        <p id="studentGender">-</p>
+                    </div>
+                    <div class="info-item" style="grid-column: span 2;">
+                        <label>Address</label>
+                        <p id="studentAddress">-</p>
+                    </div>
+                </div>
+
+                <h3 class="mb-4">Academic Information</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Course</label>
+                        <p id="studentCourse">-</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Year</label>
+                        <p id="studentYear">-</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const studentId = localStorage.getItem('srms_student_id');
+        const student = DataManager.getStudentById(studentId);
+
+        if (student) {
+            document.getElementById('profilePic').textContent = student.name.charAt(0);
+            document.getElementById('studentName').textContent = student.name;
+            document.getElementById('studentRoll').textContent = `Roll No: ${student.rollNo}`;
+            document.getElementById('studentEmail').textContent = student.email;
+            document.getElementById('studentPhone').textContent = student.phone;
+            document.getElementById('studentDob').textContent = student.dob || 'N/A';
+            document.getElementById('studentGender').textContent = student.gender;
+            document.getElementById('studentAddress').textContent = student.address || 'N/A';
+            document.getElementById('studentCourse').textContent = student.course;
+            document.getElementById('studentYear').textContent = student.year;
+        }
+    </script>
+</body>
+
+</html>

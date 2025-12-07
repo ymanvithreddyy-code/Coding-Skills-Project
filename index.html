@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - SRMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .landing-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e1b4b, var(--primary-color));
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .landing-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .role-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: var(--radius-md);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .role-btn-admin {
+            background-color: white;
+            color: var(--primary-color);
+        }
+
+        .role-btn-admin:hover {
+            background-color: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        .role-btn-student {
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .role-btn-student:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="landing-page">
+        <div class="landing-card">
+            <i class="fas fa-university fa-4x" style="margin-bottom: 1.5rem;"></i>
+            <h1 style="margin-bottom: 0.5rem;">SRMS Portal</h1>
+            <p style="margin-bottom: 2.5rem; opacity: 0.9;">Student Record Management System</p>
+
+            <a href="admin-login.html" class="role-btn role-btn-admin">
+                <i class="fas fa-user-shield"></i> Admin Login
+            </a>
+            <a href="student-login.html" class="role-btn role-btn-student">
+                <i class="fas fa-user-graduate"></i> Student Login
+            </a>
+        </div>
+        <p style="margin-top: 2rem; font-size: 0.875rem; opacity: 0.7;">&copy; 2023 SRMS. All rights reserved.</p>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

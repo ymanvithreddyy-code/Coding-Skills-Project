@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marks Management - SRMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar & Topbar injected by script.js -->
+
+        <main class="main-content">
+            <div class="flex-between mb-4">
+                <h2 class="page-title">Marks Management</h2>
+                <select id="courseFilter" class="form-control" style="width: 200px;">
+                    <option value="">All Courses</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Name</th>
+                                <th>Course</th>
+                                <th>Subject 1</th>
+                                <th>Subject 2</th>
+                                <th>Subject 3</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marksTable">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const students = DataManager.getStudents();
+        const courses = DataManager.getCourses();
+
+        // Populate Filter
+        const courseFilter = document.getElementById('courseFilter');
+        courses.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.name;
+            opt.textContent = c.name;
+            courseFilter.appendChild(opt);
+        });
+
+        // Mock Marks Data (In a real app, this would be separate)
+        let marksData = JSON.parse(localStorage.getItem('srms_marks') || '{}');
+
+        function renderTable() {
+            const selectedCourse = courseFilter.value;
+            const tbody = document.getElementById('marksTable');
+            tbody.innerHTML = '';
+
+            const filteredStudents = selectedCourse
+                ? students.filter(s => s.course === selectedCourse)
+                : students;
+
+            filteredStudents.forEach(s => {
+                const sMarks = marksData[s.id] || { sub1: 0, sub2: 0, sub3: 0 };
+                const total = parseInt(sMarks.sub1) + parseInt(sMarks.sub2) + parseInt(sMarks.sub3);
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${s.rollNo}</td>
+                    <td>${s.name}</td>
+                    <td>${s.course}</td>
+                    <td><input type="number" class="form-control" style="width: 80px" value="${sMarks.sub1}" onchange="updateMark('${s.id}', 'sub1', this.value)"></td>
+                    <td><input type="number" class="form-control" style="width: 80px" value="${sMarks.sub2}" onchange="updateMark('${s.id}', 'sub2', this.value)"></td>
+                    <td><input type="number" class="form-control" style="width: 80px" value="${sMarks.sub3}" onchange="updateMark('${s.id}', 'sub3', this.value)"></td>
+                    <td id="total-${s.id}"><strong>${total}</strong></td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="saveMarks('${s.id}')"><i class="fas fa-save"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        renderTable();
+        courseFilter.addEventListener('change', renderTable);
+
+        window.updateMark = (studentId, subject, value) => {
+            if (!marksData[studentId]) marksData[studentId] = { sub1: 0, sub2: 0, sub3: 0 };
+            marksData[studentId][subject] = value;
+
+            // Update Total UI
+            const total = parseInt(marksData[studentId].sub1) + parseInt(marksData[studentId].sub2) + parseInt(marksData[studentId].sub3);
+            document.getElementById(`total-${studentId}`).innerHTML = `<strong>${total}</strong>`;
+        };
+
+        window.saveMarks = (studentId) => {
+            localStorage.setItem('srms_marks', JSON.stringify(marksData));
+            alert('Marks saved successfully!');
+        };
+    </script>
+</body>
+
+</html>

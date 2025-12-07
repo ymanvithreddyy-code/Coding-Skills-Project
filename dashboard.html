@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SRMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar & Topbar injected by script.js -->
+
+        <main class="main-content">
+            <div class="grid-4 mb-4">
+                <div class="card">
+                    <div class="flex-between">
+                        <div>
+                            <p class="text-secondary">Total Students</p>
+                            <h2 id="totalStudents">0</h2>
+                        </div>
+                        <i class="fas fa-user-graduate fa-2x" style="color: var(--primary-color);"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="flex-between">
+                        <div>
+                            <p class="text-secondary">Total Courses</p>
+                            <h2 id="totalCourses">0</h2>
+                        </div>
+                        <i class="fas fa-book fa-2x" style="color: var(--warning-color);"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="flex-between">
+                        <div>
+                            <p class="text-secondary">Avg Attendance</p>
+                            <h2 id="avgAttendance">0%</h2>
+                        </div>
+                        <i class="fas fa-calendar-check fa-2x" style="color: var(--success-color);"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="flex-between">
+                        <div>
+                            <p class="text-secondary">Avg Marks</p>
+                            <h2 id="avgMarks">85%</h2>
+                        </div>
+                        <i class="fas fa-chart-line fa-2x" style="color: var(--danger-color);"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2"
+                style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="card">
+                    <h3>Attendance Overview</h3>
+                    <canvas id="attendanceChart" style="max-height: 300px;"></canvas>
+                </div>
+                <div class="card">
+                    <h3>Gender Distribution</h3>
+                    <canvas id="genderChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="flex-between mb-4">
+                    <h3>Recent Students</h3>
+                    <a href="students.html" class="btn btn-outline btn-sm">View All</a>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Name</th>
+                                <th>Course</th>
+                                <th>Year</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentStudentsTable">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Load Dashboard Data
+        const students = DataManager.getStudents();
+        const courses = DataManager.getCourses();
+        const attendance = DataManager.getAttendance();
+
+        // Stats
+        document.getElementById('totalStudents').textContent = students.length;
+        document.getElementById('totalCourses').textContent = courses.length;
+
+        // Calculate Avg Attendance
+        const totalPresent = attendance.reduce((acc, curr) => acc + curr.present, 0);
+        const totalRecords = attendance.reduce((acc, curr) => acc + curr.present + curr.absent, 0);
+        const avgAtt = totalRecords ? Math.round((totalPresent / totalRecords) * 100) : 0;
+        document.getElementById('avgAttendance').textContent = `${avgAtt}%`;
+
+        // Recent Students Table
+        const recentStudents = students.slice(-5).reverse();
+        const tbody = document.getElementById('recentStudentsTable');
+        recentStudents.forEach(s => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${s.rollNo}</td>
+                <td>${s.name}</td>
+                <td>${s.course}</td>
+                <td>${s.year}</td>
+                <td><span class="badge badge-success">Active</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Charts
+        const ctxAtt = document.getElementById('attendanceChart').getContext('2d');
+        new Chart(ctxAtt, {
+            type: 'bar',
+            data: {
+                labels: attendance.map(a => a.date),
+                datasets: [{
+                    label: 'Present',
+                    data: attendance.map(a => a.present),
+                    backgroundColor: '#10b981'
+                }, {
+                    label: 'Absent',
+                    data: attendance.map(a => a.absent),
+                    backgroundColor: '#ef4444'
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        const ctxGender = document.getElementById('genderChart').getContext('2d');
+        const males = students.filter(s => s.gender === 'Male').length;
+        const females = students.filter(s => s.gender === 'Female').length;
+
+        new Chart(ctxGender, {
+            type: 'doughnut',
+            data: {
+                labels: ['Male', 'Female'],
+                datasets: [{
+                    data: [males, females],
+                    backgroundColor: ['#2563eb', '#ec4899']
+                }]
+            },
+            options: { responsive: true }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login - SRMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="login-page">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-user-graduate fa-3x" style="color: var(--primary-color); margin-bottom: 1rem;"></i>
+                <h1>Student Login</h1>
+                <p>Enter your Roll Number and Password</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Roll Number</label>
+                    <input type="text" class="form-control" id="rollNo" placeholder="e.g. CS101" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Default: 12345" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                <div class="text-center mt-4">
+                    <a href="index.html" style="color: var(--primary-color); font-size: 0.9rem;">Back to Home</a>
+                </div>
+                <p id="errorMsg"
+                    style="color: var(--danger-color); text-align: center; margin-top: 1rem; display: none;">Invalid
+                    credentials</p>
+            </form>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const rollNo = document.getElementById('rollNo').value;
+            const pass = document.getElementById('password').value;
+
+            const student = DataManager.getStudentByRollNo(rollNo);
+
+            if (student && student.password === pass) {
+                localStorage.setItem('srms_role', 'student');
+                localStorage.setItem('srms_student_id', student.id);
+                localStorage.setItem('srms_student_name', student.name);
+                window.location.href = 'student-dashboard.html';
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>

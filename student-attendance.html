@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Attendance - SRMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar & Topbar injected by script.js -->
+
+        <main class="main-content">
+            <h2 class="page-title mb-4">My Attendance</h2>
+
+            <div class="grid-2 mb-4">
+                <div class="card">
+                    <h3>Attendance Summary</h3>
+                    <div style="display: flex; align-items: center; justify-content: center; height: 200px;">
+                        <div style="text-align: center;">
+                            <h1 style="font-size: 4rem; color: var(--success-color);">85%</h1>
+                            <p class="text-secondary">Overall Attendance</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Recent History</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2023-10-05</td>
+                                <td><span class="badge badge-success">Present</span></td>
+                            </tr>
+                            <tr>
+                                <td>2023-10-04</td>
+                                <td><span class="badge badge-success">Present</span></td>
+                            </tr>
+                            <tr>
+                                <td>2023-10-03</td>
+                                <td><span class="badge badge-danger">Absent</span></td>
+                            </tr>
+                            <tr>
+                                <td>2023-10-02</td>
+                                <td><span class="badge badge-success">Present</span></td>
+                            </tr>
+                            <tr>
+                                <td>2023-10-01</td>
+                                <td><span class="badge badge-success">Present</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

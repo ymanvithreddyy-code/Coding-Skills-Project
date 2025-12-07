@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Student - SRMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar & Topbar injected by script.js -->
+
+        <main class="main-content">
+            <div class="flex-between mb-4">
+                <h2 class="page-title">Edit Student</h2>
+                <a href="students.html" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+
+            <div class="card" style="max-width: 800px; margin: 0 auto;">
+                <form id="editStudentForm">
+                    <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Roll Number</label>
+                            <input type="text" name="rollNo" id="rollNo" class="form-control" required readonly
+                                style="background-color: #f8fafc;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="name" id="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" id="email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" name="phone" id="phone" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Course</label>
+                            <select name="course" id="courseSelect" class="form-control" required>
+                                <option value="">Select Course</option>
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Year</label>
+                            <select name="year" id="year" class="form-control" required>
+                                <option value="1st">1st Year</option>
+                                <option value="2nd">2nd Year</option>
+                                <option value="3rd">3rd Year</option>
+                                <option value="4th">4th Year</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            <select name="gender" id="gender" class="form-control" required>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" name="dob" id="dob" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <textarea name="address" id="address" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary" style="min-width: 150px;">
+                            <i class="fas fa-save"></i> Update Student
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Get Student ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentId = urlParams.get('id');
+
+        if (!studentId) {
+            alert('Invalid Student ID');
+            window.location.href = 'students.html';
+        }
+
+        // Populate Courses
+        const courses = DataManager.getCourses();
+        const courseSelect = document.getElementById('courseSelect');
+        courses.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.name;
+            opt.textContent = c.name;
+            courseSelect.appendChild(opt);
+        });
+
+        // Load Student Data
+        const student = DataManager.getStudentById(studentId);
+        if (student) {
+            document.getElementById('rollNo').value = student.rollNo;
+            document.getElementById('name').value = student.name;
+            document.getElementById('email').value = student.email;
+            document.getElementById('phone').value = student.phone;
+            document.getElementById('courseSelect').value = student.course;
+            document.getElementById('year').value = student.year;
+            document.getElementById('gender').value = student.gender;
+            if (student.dob) document.getElementById('dob').value = student.dob;
+            if (student.address) document.getElementById('address').value = student.address;
+        } else {
+            alert('Student not found');
+            window.location.href = 'students.html';
+        }
+
+        // Handle Submit
+        document.getElementById('editStudentForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const updatedData = Object.fromEntries(formData.entries());
+
+            DataManager.updateStudent(studentId, updatedData);
+            alert('Student updated successfully!');
+            window.location.href = 'students.html';
+        });
+    </script>
+</body>
+
+</html>
